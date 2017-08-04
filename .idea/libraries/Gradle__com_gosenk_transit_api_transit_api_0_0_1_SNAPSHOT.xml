@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: com.gosenk.transit.api:transit-api:0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/gosenk/transit/api/transit-api/0.0.1-SNAPSHOT/transit-api-0.0.1-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
