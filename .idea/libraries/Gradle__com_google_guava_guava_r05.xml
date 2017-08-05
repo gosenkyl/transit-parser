@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: com.google.guava:guava:r05">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/r05/guava-r05.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
