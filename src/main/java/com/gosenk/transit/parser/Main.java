@@ -36,7 +36,7 @@ public class Main implements CommandLineRunner {
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
 
         Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("data.sql"), "utf-8"));
-        writer.write("use msu_cata;");
+        writer.write("use transit;");
 
         String inputLine;
         while((inputLine = in.readLine()) != null){
