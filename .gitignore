@@ -151,3 +151,6 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+
+# Project Specific
+src/main/resources/google_transit/*.txt
