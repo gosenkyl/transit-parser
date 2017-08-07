@@ -1,2 +1,0 @@
-agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url
-01,Capital Area Transportation Authority,http://www.cata.org,America/Detroit,en,517-394-1000,
