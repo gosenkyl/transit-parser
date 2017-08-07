@@ -3,7 +3,7 @@ CREATE SCHEMA transit;
 use transit;
 
 CREATE TABLE `transit`.`agency` (
-  `id` VARCHAR(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
   `agency_name` VARCHAR(100) NULL,
   `agency_url` VARCHAR(255) NULL,
   `agency_timezone` VARCHAR(32) NULL,
@@ -13,7 +13,7 @@ CREATE TABLE `transit`.`agency` (
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`calendar` (
-  `id` VARCHAR(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
   `service_id` VARCHAR(32) NOT NULL,
   `monday` TINYINT(1) NOT NULL DEFAULT 0,
   `tuesday` TINYINT(1) NOT NULL DEFAULT 0,
@@ -27,14 +27,14 @@ CREATE TABLE `transit`.`calendar` (
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`calendar_dates` (
-  `id` varchar(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
   `service_id` varchar(32) NOT NULL,
   `date` date NOT NULL,
   `exception_type` int(2) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`fare_attributes` (
-  `id` VARCHAR(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
   `fare_id` VARCHAR(32) NOT NULL,
   `price` FLOAT NULL,
   `currency_type` VARCHAR(32) NULL,
@@ -44,7 +44,7 @@ CREATE TABLE `transit`.`fare_attributes` (
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`fare_rules` (
-  `id` VARCHAR(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
   `fare_id` VARCHAR(32) NOT NULL,
   `route_id` VARCHAR(32) NULL,
   `origin_id` VARCHAR(32) NULL,
@@ -53,17 +53,17 @@ CREATE TABLE `transit`.`fare_rules` (
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`feed_info` (
-  `id` VARCHAR(32) NOT NULL,
-  `feed_publisher_name` VARCHAR(32) NULL,
-  `feed_publisher_url` VARCHAR(32) NULL,
+  `id` VARCHAR(36) NOT NULL,
+  `feed_publisher_name` VARCHAR(100) NULL,
+  `feed_publisher_url` VARCHAR(100) NULL,
   `feed_lang` VARCHAR(32) NULL,
   `feed_start_date` DATE NULL,
   `feed_end_date` DATE NULL,
   `feed_version` VARCHAR(32) NULL,
   PRIMARY KEY (`id`));
 
-CREATE TABLE `transit`.`route` (
-  `id` VARCHAR(32) NOT NULL,
+CREATE TABLE `transit`.`routes` (
+  `id` VARCHAR(36) NOT NULL,
   `agency_id` VARCHAR(32) NULL,
   `route_short_name` VARCHAR(100) NULL,
   `route_long_name` VARCHAR(100) NULL,
@@ -75,7 +75,8 @@ CREATE TABLE `transit`.`route` (
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`shapes` (
-  `id` VARCHAR(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
+  `shape_id` VARCHAR(36) NOT NULL,
   `shape_pt_lat` DOUBLE NULL,
   `shape_pt_lon` DOUBLE NULL,
   `shape_pt_sequence` INT(11) NULL,
@@ -83,7 +84,7 @@ CREATE TABLE `transit`.`shapes` (
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`stop_times` (
-  `id` VARCHAR(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
   `trip_id` VARCHAR(32) NULL,
   `arrival_time` TIME(0) NULL,
   `departure_time` TIME(0) NULL,
@@ -96,7 +97,7 @@ CREATE TABLE `transit`.`stop_times` (
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`stops` (
-  `id` VARCHAR(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
   `stop_code` VARCHAR(32) NULL,
   `stop_name` VARCHAR(100) NULL,
   `stop_desc` VARCHAR(100) NULL,
@@ -111,7 +112,7 @@ CREATE TABLE `transit`.`stops` (
   PRIMARY KEY (`id`));
 
 CREATE TABLE `transit`.`trips` (
-  `id` VARCHAR(32) NOT NULL,
+  `id` VARCHAR(36) NOT NULL,
   `route_id` VARCHAR(32) NULL,
   `service_id` VARCHAR(32) NULL,
   `trip_headsign` VARCHAR(100) NULL,
@@ -162,6 +163,15 @@ DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER feed_info_id
 BEFORE INSERT ON feed_info
+FOR EACH  ROW
+BEGIN
+    SET NEW.id = UUID();
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER shapes_id
+BEFORE INSERT ON shapes
 FOR EACH  ROW
 BEGIN
     SET NEW.id = UUID();
