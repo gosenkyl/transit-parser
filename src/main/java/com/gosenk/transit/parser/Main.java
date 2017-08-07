@@ -34,8 +34,10 @@ public class Main implements CommandLineRunner {
 
         String inputLine;
         while((inputLine = in.readLine()) != null){
-            InputStream fileStream = getClass().getResourceAsStream("/google_transit/"+inputLine);
-            generateInserts(fileStream, writer, inputLine);
+            if(inputLine.contains(".txt")) {
+                InputStream fileStream = getClass().getResourceAsStream("/google_transit/" + inputLine);
+                generateInserts(fileStream, writer, inputLine);
+            }
         }
 
         in.close();
