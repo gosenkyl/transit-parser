@@ -24,27 +24,22 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
         // Lansing CATA
         InputStream is = getClass().getResourceAsStream("/google_transit");
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
-
-        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("data.sql"), "utf-8"));
-        writer.write("use transit;");
 
         String inputLine;
         while((inputLine = in.readLine()) != null){
             if(inputLine.contains(".txt")) {
                 InputStream fileStream = getClass().getResourceAsStream("/google_transit/" + inputLine);
-                generateInserts(fileStream, writer, inputLine);
+                generateInserts(fileStream, inputLine);
             }
         }
 
         in.close();
-        writer.close();
     }
 
-    private void generateInserts(InputStream is, Writer writer, String fileName) throws Exception {
+    private void generateInserts(InputStream is, String fileName) throws Exception {
 
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
         String firstLine = in.readLine();
@@ -55,13 +50,22 @@ public class Main implements CommandLineRunner {
 
         String tableName = fileName.split("\\.")[0];
 
+        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("data/" + tableName + ".sql"), "utf-8"));
+
         LinkedHashMap<String, LinkedHashMap<String, String>> propertyDefs = structureMap.get(tableName);
 
         // Reads the first line of the file (columns) for insert order
-        StringJoiner sj = new StringJoiner(" ");
-        sj.add("INSERT INTO");
-        sj.add(tableName);
-        sj.add("(");
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("USE transit;");
+
+        sb.append("TRUNCATE TABLE ");
+        sb.append(tableName);
+        sb.append(";");
+
+        sb.append("INSERT INTO ");
+        sb.append(tableName);
+        sb.append(" (");
 
         String[] fields = firstLine.split(",", -1);
 
@@ -70,26 +74,35 @@ public class Main implements CommandLineRunner {
         LinkedHashMap<String, String> typeNameMap;
         for(String field : fields){
             if(i > 0){
-                sj.add(",");
+                sb.append(",");
             }
 
             typeNameMap = propertyDefs != null ? propertyDefs.get(field) : null;
             name = typeNameMap != null && typeNameMap.get("name") != null ? typeNameMap.get("name") : field;
 
-            sj.add(name);
+            sb.append(name);
             i++;
         }
 
-        sj.add(") VALUES (");
+        sb.append(") VALUES ");
 
-        String initStr = sj.toString();
+        String insertPrefix = sb.toString();
+        writer.write(insertPrefix);
+        //System.out.println(sb.toString());
 
+        int count = 0;
+        int fileNumber = 0;
         String inputLine;
         while((inputLine = in.readLine()) != null){
             String[] values = inputLine.split(",", -1);
 
-            sj = new StringJoiner(" ");
-            sj.add(initStr);
+            sb.setLength(0);
+
+            if(count > 0){
+                sb.append(",");
+            }
+
+            sb.append("(");
 
             int j = 0;
             String type;
@@ -98,18 +111,40 @@ public class Main implements CommandLineRunner {
                 type = typeNameMap != null && typeNameMap.get("type") != null ? typeNameMap.get("type") : "string";
 
                 if(j > 0){
-                    sj.add(",");
+                    sb.append(",");
                 }
-                sj.add(getFieldValue(value, type));
+                sb.append(getFieldValue(value, type));
                 j++;
             }
 
-            sj.add(");");
+            sb.append(")");
 
-            writer.write(sj.toString());
-            System.out.println(sj.toString());
+            writer.write(sb.toString());
+            //System.out.println(sb.toString());
+
+            count++;
+
+            if(count > 50000){
+                writer.write(";");
+
+                writer.close();
+
+                fileNumber++;
+                count = 0;
+
+                writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("data/" + tableName + fileNumber + ".sql"), "utf-8"));
+                writer.write(insertPrefix.replace("TRUNCATE TABLE " + tableName + ";", ""));
+            }
         }
+
+        if(count > 0) {
+            writer.write(";");
+        }
+
         is.close();
+        writer.close();
+
+        System.out.println("----- " + tableName + " DONE -----");
     }
 
     private String getFieldValue(String value, String type) throws Exception{

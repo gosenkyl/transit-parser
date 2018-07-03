@@ -155,3 +155,5 @@ buildNumber.properties
 # Project Specific
 src/main/resources/google_transit/*.txt
 data.sql
+data.zip
+data
